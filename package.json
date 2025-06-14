@@ -1,0 +1,24 @@
+{
+  "name": "gamedev-ws",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Divya-Darshan/gamedev-ws.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Divya-Darshan/gamedev-ws/issues"
+  },
+  "homepage": "https://github.com/Divya-Darshan/gamedev-ws#readme",
+  "description": "",
+  "dependencies": {
+    "ws": "^8.18.2"
+  }
+}
