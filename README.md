@@ -16,7 +16,9 @@ Designed for real-time multiplayer games (e.g., Godot Engine clients) and deploy
 
 ## 📁 Project Structure
 gamedev-ws/
+
 ├── server.js # Main WebSocket server code
+
 ├── package.json # Project metadata and dependencies
 
 ---
