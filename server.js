@@ -8,8 +8,10 @@ server.on("connection", (socket) => {
   console.log("🟢 New player connected");
 
   socket.on("message", (msg) => {
+    // Log the message received from client
     console.log("📨 Message received:", msg);
 
+    // Broadcast the message to all other connected clients
     server.clients.forEach((client) => {
       if (client !== socket && client.readyState === WebSocket.OPEN) {
         client.send(msg);
