@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📡 Server Log Monitor</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #111;
+      color: #0f0;
+      padding: 1rem;
+    }
+    #log {
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <h2>📋 Live Server Logs</h2>
+  <div id="log">Connecting...</div>
+
+  <script>
+    const logEl = document.getElementById("log");
+    const ws = new WebSocket("wss://" + location.host);
+
+
+    ws.onopen = () => {
+      logEl.textContent = "✅ Connected to server\n";
+    };
+
+    ws.onmessage = (event) => {
+      logEl.textContent += event.data + "\n";
+    };
+
+    ws.onclose = () => {
+      logEl.textContent += "❌ Disconnected from server\n";
+    };
+
+    ws.onerror = (err) => {
+      logEl.textContent += "⚠️ Error: " + err.message + "\n";
+    };
+  </script>
+</body>
+</html>

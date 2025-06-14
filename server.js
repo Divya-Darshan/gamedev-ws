@@ -1,32 +1,46 @@
+const express = require("express");
+const http = require("http");
 const WebSocket = require("ws");
-const PORT = process.env.PORT || 3000;
+const path = require("path");
 
-const server = new WebSocket.Server({ port: PORT });
-console.log("✅ WebSocket server started on port", PORT);
+const PORT = process.env.PORT || 10000; // Render sets this automatically
+const app = express();
+const server = http.createServer(app);
 
-server.on("connection", (socket) => {
+// Serve static files like index.html
+app.use(express.static(path.join(__dirname)));
+
+// Create WebSocket server using the same HTTP server
+const wss = new WebSocket.Server({ server });
+
+console.log("✅ WebSocket + Express server started on port", PORT);
+
+// WebSocket logic
+wss.on("connection", (ws) => {
   console.log("🟢 New player connected");
+  sendToAllClients("🟢 New player connected");
 
-  // Notify just this client
-  socket.send("✅ You are connected to the WebSocket server!");
-
-  socket.on("message", (msg) => {
-    const message = msg.toString(); // decode Buffer
-    console.log("📨 Message received:", message);
-
-    // Broadcast to others
-    server.clients.forEach((client) => {
-      if (client !== socket && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
+  ws.on("message", (msg) => {
+    console.log("📨 Message received:", msg.toString());
+    sendToAllClients("📨 " + msg.toString(), ws);
   });
 
-  socket.on("close", () => {
+  ws.on("close", () => {
     console.log("🔴 Player disconnected");
+    sendToAllClients("🔴 Player disconnected");
   });
+});
 
-  socket.on("error", (err) => {
-    console.error("⚠️ WebSocket error:", err);
+// Broadcast to all connected clients except optional `exclude`
+function sendToAllClients(message, exclude) {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN && client !== exclude) {
+      client.send(message);
+    }
   });
+}
+
+// Start server
+server.listen(PORT, () => {
+  console.log(`🌐 Server is live at https://gamedev-ws.onrender.com`);
 });
