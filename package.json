@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/Divya-Darshan/gamedev-ws#readme",
   "dependencies": {
-    "express": "^5.1.0",
     "ws": "^8.18.2"
   },
   "engines": {

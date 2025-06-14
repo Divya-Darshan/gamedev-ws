@@ -1,46 +1,25 @@
-const express = require("express");
-const http = require("http");
+// Use only ws for WebSocket server
 const WebSocket = require("ws");
-const path = require("path");
+const PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 10000; // Render sets this automatically
-const app = express();
-const server = http.createServer(app);
+const server = new WebSocket.Server({ port: PORT });
+console.log("✅ WebSocket server started on port", PORT);
 
-// Serve static files like index.html
-app.use(express.static(path.join(__dirname)));
-
-// Create WebSocket server using the same HTTP server
-const wss = new WebSocket.Server({ server });
-
-console.log("✅ WebSocket + Express server started on port", PORT);
-
-// WebSocket logic
-wss.on("connection", (ws) => {
+server.on("connection", (socket) => {
   console.log("🟢 New player connected");
-  sendToAllClients("🟢 New player connected");
 
-  ws.on("message", (msg) => {
-    console.log("📨 Message received:", msg.toString());
-    sendToAllClients("📨 " + msg.toString(), ws);
+  socket.send("✅ You are connected to the WebSocket server!");
+
+  socket.on("message", (msg) => {
+    console.log("📨 Message received:", msg);
+    server.clients.forEach((client) => {
+      if (client !== socket && client.readyState === WebSocket.OPEN) {
+        client.send(msg);
+      }
+    });
   });
 
-  ws.on("close", () => {
+  socket.on("close", () => {
     console.log("🔴 Player disconnected");
-    sendToAllClients("🔴 Player disconnected");
   });
-});
-
-// Broadcast to all connected clients except optional `exclude`
-function sendToAllClients(message, exclude) {
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN && client !== exclude) {
-      client.send(message);
-    }
-  });
-}
-
-// Start server
-server.listen(PORT, () => {
-  console.log(`🌐 Server is live at https://gamedev-ws.onrender.com`);
 });
