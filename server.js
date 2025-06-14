@@ -7,19 +7,26 @@ console.log("✅ WebSocket server started on port", PORT);
 server.on("connection", (socket) => {
   console.log("🟢 New player connected");
 
-  socket.on("message", (msg) => {
-    // Log the message received from client
-    console.log("📨 Message received:", msg);
+  // Notify just this client
+  socket.send("✅ You are connected to the WebSocket server!");
 
-    // Broadcast the message to all other connected clients
+  socket.on("message", (msg) => {
+    const message = msg.toString(); // decode Buffer
+    console.log("📨 Message received:", message);
+
+    // Broadcast to others
     server.clients.forEach((client) => {
       if (client !== socket && client.readyState === WebSocket.OPEN) {
-        client.send(msg);
+        client.send(message);
       }
     });
   });
 
   socket.on("close", () => {
     console.log("🔴 Player disconnected");
+  });
+
+  socket.on("error", (err) => {
+    console.error("⚠️ WebSocket error:", err);
   });
 });
